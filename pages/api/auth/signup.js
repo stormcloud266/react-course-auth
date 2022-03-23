@@ -2,8 +2,7 @@ import { connectToDatabase } from '../../../lib/db'
 import { hashPassword } from '../../../lib/auth'
 
 async function handler(req, res) {
-	const data = req.body
-	const { email, body } = data
+	const { email, password } = req.body
 
 	if (
 		!email ||
@@ -11,7 +10,10 @@ async function handler(req, res) {
 		!password ||
 		password.trim().length < 7
 	) {
-		res.status(422).json({ message: 'Invalid input data' })
+		res.status(422).json({
+			message:
+				'Please enter valid email and password with at least 7 characters',
+		})
 		return
 	}
 
@@ -20,11 +22,12 @@ async function handler(req, res) {
 
 	const hashedPassword = hashPassword(password)
 
-	const result = await db
-		.collection('users')
-		.insertOne({ email, password: hashedPassword })
+	const result = db.collection('users').insertOne({
+		email,
+		password: hashedPassword,
+	})
 
-	res.status(201).json({ message: 'Created user!' })
+	res.status(201).json({ message: 'Signed up successfully!' })
 }
 
 export default handler

@@ -2,6 +2,10 @@ import { connectToDatabase } from '../../../lib/db'
 import { hashPassword } from '../../../lib/auth'
 
 async function handler(req, res) {
+	if (req.method !== 'POST') {
+		return
+	}
+
 	const { email, password } = req.body
 
 	if (

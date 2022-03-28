@@ -24,14 +24,25 @@ async function handler(req, res) {
 	const client = await connectToDatabase()
 	const db = client.db()
 
+	const existingUser = await db.collection('users').findOne({ email })
+
+	if (existingUser) {
+		res.status(422).json({
+			message: 'Email already in use',
+		})
+		client.close()
+		return
+	}
+
 	const hashedPassword = await hashPassword(password)
 
-	const result = db.collection('users').insertOne({
+	const result = await db.collection('users').insertOne({
 		email,
 		password: hashedPassword,
 	})
 
 	res.status(201).json({ message: 'Signed up successfully!' })
+	client.close()
 }
 
 export default handler
